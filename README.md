@@ -41,6 +41,8 @@ Install the Raspberry Pi OS 64-bit by following [Install using Imager](https://w
 _Raspberry Pi Device:_ **Raspberry Pi 4**
 _Operating System:_ **Raspberry Pi OS (64-bit)**
 
+Boot-up the Raspberry Pi OS as per usual and set up the credentials, and other configurations.
+
 ---
 ## **Build the Microchip Linux Kernel:**
 The Linux Kernel we will use is from the Microchip's Fork. The kernel version we'll be using is `v6.12`--the latest version as of this writing. We will also use the `bcm2711_defconfig` from Raspberry Pi's Fork as the base config.
@@ -121,7 +123,6 @@ make -j12 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig
 # Tick [N] to Remove
 [ ] IOMMU Hardware Support                       (IOMMU_SUPPORT [=n])
 [ ] NUMA Memory Allocation and Scheduler Support (NUMA [=n])
-[ ] Support for hot-pluggable CPUs               (CONFIG_HOTPLUG_CPU[=n])  
 [ ] Randomize the address of the kernel image    (RANDOMIZE_BASE [=n])
   
 ```
