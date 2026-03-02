@@ -3,9 +3,11 @@
 
 This document describes the process of integrating the **LAN966x PCIe network switch driver** into the standard Raspberry Pi OS, running on a Raspberry Pi Compute Module 4 (CM4). The official RPi OS doesn't natively support LAN966x PCIe, so this build bridges that gap by compiling Microchip's Linux kernel fork with the necessary drivers and configurations, allowing users to run a full-featured Raspberry Pi OS alongside the LAN966x switch hardware.
 
-The Raspberry Pi Compute Module 4 is an embedded platform, and Microchip's LAN966x is a multi-port Ethernet switch chip capable of advanced networking features. While Microchip provides a basic Board Support Package (BSP) for the two together, it lacks the full richness of the standard Raspberry Pi OS ecosystem, things like package management, and familiar tooling.
+While Microchip provides a basic Board Support Package (BSP), it lacks the full richness of the standard Raspberry Pi OS ecosystem, things like package management, and familiar tooling.
 
-This project solves that by taking the best of both worlds: it starts with the standard 64-bit Raspberry Pi OS as the base, then builds and installs a custom kernel derived from Microchip's Linux fork (v6.12), configured with all the drivers needed to bring the LAN966x switch to life over PCIe.
+This project solves that by taking the best of both worlds: it starts with the standard 64-bit Raspberry Pi OS as the base, then builds and installs a custom kernel derived from Microchip's Linux fork (v6.12).
+
+> Disclaimer Note: This integration is intended as a functional proof-of-concept and has not been performance-optimized. In its current form, throughput is limited to approximately 95 Mbps.
 
 ---
 ## General Idea
@@ -41,7 +43,7 @@ Install the Raspberry Pi OS 64-bit by following [Install using Imager](https://w
 _Raspberry Pi Device:_ **Raspberry Pi 4**
 _Operating System:_ **Raspberry Pi OS (64-bit)**
 
-Boot-up the Raspberry Pi OS as per usual and set up the credentials, and other configurations.
+Boot-up the Raspberry Pi OS as per usual and set up the credentials, and other configurations. 
 
 ---
 ## **Build the Microchip Linux Kernel:**
@@ -123,7 +125,7 @@ make -j12 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig
 # Tick [N] to Remove
 [ ] IOMMU Hardware Support                       (IOMMU_SUPPORT [=n])
 [ ] NUMA Memory Allocation and Scheduler Support (NUMA [=n])
-[ ] Randomize the address of the kernel image    (RANDOMIZE_BASE [=n])
+#[ ] Randomize the address of the kernel image    (RANDOMIZE_BASE [=n])
   
 ```
 
@@ -159,8 +161,24 @@ git checkout rpi/rpi-6.12.y -- include/dt-bindings/clock/rp1.h
 git checkout rpi/rpi-6.12.y -- include/dt-bindings/gpio/gpio-fsm.h
 git checkout rpi/rpi-6.12.y -- include/dt-bindings/mfd/rp1.h
 ```
-The device tree to use is `bcm2711-rpi-cm4-lan966x`.
-* Edit the `Makefile` to include `bcm2711-rpi-cm4-lan966x` during build:
+
+We need to correct the `ranges` property in the PCIe node of the device tree `bcm2711.dtsi`. 
+```shell
+nano arch/arm/boot/dts/broadcom/bcm2711.dtsi
+```
+The relevant DT node (/scb/pcie@7d500000) should have its inbound mapping changed from:
+```
+ranges = <0x02000000 0x0 0xf8000000 0x6 0x00000000
+				  0x0 0x04000000>;
+```
+To:
+```
+/* Correct - identity map for LAN966x FDMA */
+ranges = <0x02000000 0x0 0xc0000000 0x6 0x00000000
+				  0x0 0x40000000>;
+```
+
+The device tree to use is `bcm2711-rpi-cm4-lan966x`. So edit the `Makefile` to include `bcm2711-rpi-cm4-lan966x` during build:
 ```shell
 nano arch/arm64/boot/dts/broadcom/Makefile
 ```
@@ -183,7 +201,6 @@ make -j12 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image modules dtbs
 ```
 > The build may take a while so grab a coffee ☕
 ### 7. Install the Kernel
-
 Having built the kernel, you need to copy it onto your Raspberry Pi boot media (likely an SD card or SSD) and install the modules.
 
 Find your boot media
@@ -228,6 +245,7 @@ arm_64bit=1
 kernel=kernel8.img       #boots the newly built kernel
 dtoverlay=pcie-32bit-dma #this overlay prevents firmware from extending the PCIe inbound window beyond 32-bit
 device_tree=bcm2711-rpi-cm4-lan966x.dtb #target DTB to be loaded
+otg_mode=0               #Disable OTG mode of the USB
 ```
 Type:
 **`CTRL + O`** to save
