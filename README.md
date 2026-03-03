@@ -40,7 +40,14 @@ Install the Raspberry Pi OS 64-bit to the Boot Media (SD Card) by following [Ins
 * _Operating System:_ **Raspberry Pi OS (64-bit)**
 * [`2025-12-04-raspios-trixie-arm64.img`](https://downloads.raspberrypi.com/raspios_arm64/images/raspios_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64.img.xz)
 
-**Boot-up the Raspberry Pi OS as per usual and set up the credentials, and other configurations.** Once done, remove the Boot Media.
+
+**Boot-up the Raspberry Pi OS as per usual**: 
+* Set up credentials
+* Set up configurations
+* Set up time and date
+* Update using `sudo apt update && sudo apt upgrade -y`
+
+Once done, remove the Boot Media.
 
 ---
 ## **Build the Microchip Linux Kernel:**
@@ -226,11 +233,20 @@ sudo nano mnt/boot/config.txt
 Add the following texts at the bottom of `config.txt`, save then exit.
 ```shell
 [all]
+#use 64-bit
 arm_64bit=1
-kernel=kernel8.img       #boots the newly built kernel
-dtoverlay=pcie-32bit-dma #this overlay prevents firmware from extending the PCIe inbound window beyond 32-bit
-device_tree=bcm2711-rpi-cm4-lan966x.dtb #target DTB to be loaded
-otg_mode=0               #Disable OTG mode of the USB
+
+#boots the newly built kernel
+kernel=kernel8.img
+
+#this overlay prevents firmware from extending the PCIe inbound window beyond 32-bit
+dtoverlay=pcie-32bit-dma
+
+#target DTB to be loaded
+device_tree=bcm2711-rpi-cm4-lan966x.dtb
+
+#Disable OTG mode of the USB
+otg_mode=0
 ```
 Save and Exit
 ```
