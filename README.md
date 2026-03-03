@@ -216,8 +216,8 @@ sudo env PATH=$PATH make -j12 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- INSTAL
 ### 3. Install Kernel onto the boot media:
 Run the following commands to create a backup image of the current kernel, install the fresh kernel image, overlays.
 ```shell
-sudo cp mnt/boot/$KERNEL.img mnt/boot/$KERNEL-backup.img
-sudo cp arch/arm64/boot/Image mnt/boot/$KERNEL.img
+sudo cp mnt/boot/kernel8.img mnt/boot/kernel8-backup.img
+sudo cp arch/arm64/boot/Image mnt/boot/kernel8.img
 sudo cp -r arch/arm64/boot/dts/broadcom/*.dtb* mnt/boot/
 sudo cp -r arch/arm64/boot/dts/overlays/*.dtb* mnt/boot/overlays/
 ```
