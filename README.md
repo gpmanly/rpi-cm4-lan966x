@@ -25,7 +25,7 @@ Once built, the kernel image, modules, and device tree blobs are installed onto 
 | ![](raspi-cm4-1.png) | ![](lan9662-nic.png) |
 | -------------------- | -------------------- |
 
-Overall set up this:
+Overall set up:
 
 ![](lan9662-rpicm4.png)
 
