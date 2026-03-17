@@ -1,5 +1,5 @@
 # Integrating LAN966x to Raspberry Pi OS
-This document describes the process of integrating the **LAN966x PCIe network switch driver** into the standard Raspberry Pi OS, running on a Raspberry Pi Compute Module 4 (CM4). The official RPi OS doesn't natively support LAN966x PCIe, so this build bridges that gap by compiling Microchip's Linux kernel fork with the necessary drivers and configurations, allowing users to run a full-featured Raspberry Pi OS alongside the LAN966x switch hardware.
+This document describes the process of integrating the **LAN966x PCIe network switch driver** into the standard Raspberry Pi OS, running on a Raspberry Pi Compute Module 4 (CM4). This build compiles Microchip's Linux kernel fork with the necessary drivers and configurations, allowing users to run a full-featured Raspberry Pi OS alongside the LAN966x switch hardware.
 
 While Microchip provides a basic Board Support Package (BSP), it lacks the full richness of the standard Raspberry Pi OS ecosystem, things like package management, and familiar tooling.
 
@@ -125,6 +125,7 @@ Add the LAN966x drivers and related components in the Linux config:
 # Tick [M] to Module
 <M> Credit Based Shaper (CBS)                 (NET_SCH_CBS [=m])
 <M> Earliest TxTime First (ETF)               (NET_SCH_ETF [=m])
+<M> Time Aware Priority (taprio) Scheduler  (NET_SCH_TAPRIO [=m])
 ```
 Remove the following component in the Linux config:
 ```c
