@@ -121,6 +121,10 @@ Add the LAN966x drivers and related components in the Linux config:
 <*> Pinctrl driver for the Ocelot and Jaguar2 SoCs (PINCTRL_OCELOT)
 <*> High-availability Seamless Redundancy     (HSR [=y])
 [*] IP-VLAN support                           (IPVLAN [=y])
+
+# Tick [M] to Module
+<M> Credit Based Shaper (CBS)                 (NET_SCH_CBS [=m])
+<M> Earliest TxTime First (ETF)               (NET_SCH_ETF [=m])
 ```
 Remove the following component in the Linux config:
 ```c
